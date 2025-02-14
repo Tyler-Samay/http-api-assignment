@@ -2,9 +2,81 @@
 <html lang="en">
 <head>
   <title>Our simple HTTP server</title>
-  <link rel="stylesheet" type="text/css" href="/style.css">
-  
+  <link rel="stylesheet" type="text/css" href="style.css">
   <script>
+    
+  const handleResponse = async (response) => {
+    const content = document.getElementById('content');
+
+    //Based on the status code we got back from the server, display something.
+    switch(response.status) {
+      case 200: //Success
+        content.innerHTML = `<b>Success</b>
+        <p>Message: This is a successful response</p>`;  
+        break;
+      case 400: //Bad Request
+        content.innerHTML = `<b>Bad Request</b>
+        <p>Message: Missing valid query parameter set to true</p>`;
+        break;
+      case 404: //Not Found
+        content.innerHTML = `<b>Resource Not Found</b>
+        <p>Message: The page you are looking for was not found</p>`;
+        break;
+      case 401: //Unauthorized
+        content.innerHTML = `<b>Unauthorized</b>
+        <p>Message: Missing loggedIn query parameter set to yes</p>`;
+        break;
+      case 403: //Forbidden
+        content.innerHTML = `<b>Forbidden</b>
+        <p>Message: You do not have access to this content</p>`;
+        break;
+      case 500: //Internal Server Error
+        content.innerHTML = `<b>Internal Server Error</b>
+        <p>Message: Internal Server Error. Something went wrong</p>`;
+        break;
+      case 501: //Not Implemented
+        content.innerHTML = `<b>Not Implemented</b>
+        <p>Message: A get request for this page has not been implemented yet. Check again later for updated content</p>`;
+        break;
+      default: //Anything Else
+        content.innerHTML = `<p>Status Code not Implemented By Client</p>`;
+        break;
+    }
+
+    let obj = await response.json();
+    let jsonString = JSON.stringify(obj);
+    console.log(jsonString);
+    //content.innerHTML += `<p>${jsonString}</p>`;
+  };
+
+  const sendFetch = async (url) => {
+    //Call fetch, wait til we get a response, and then store that response in the variable.
+    let response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      }
+    });
+
+    //Call handleResponse with the response we got back from the server.
+    handleResponse(response);
+  };
+
+    const init = () => {
+      const send = document.getElementById('send');
+      const page = document.getElementById('page');
+      const type = document.getElementById('type');
+
+      send.addEventListener('click', (e) => {
+        e.preventDefault();
+        sendFetch(page.value);
+        return false;
+      }
+  );
+
+    };
+
+    window.onload = init;
 
   </script>
 </head>
