@@ -43,20 +43,54 @@
         break;
     }
 
-    let obj = await response.json();
-    let jsonString = JSON.stringify(obj);
-    console.log(jsonString);
+    // Get the content type from the response
+    let contentType = response.headers.get('Content-Type');
+    console.log("Content Type: " + contentType);
+
+    if (contentType.includes("application/json")) {
+      let obj = await response.json();
+      let jsonString = JSON.stringify(obj);
+      console.log("JSON: " + jsonString);
+    } 
+    
+    else if (contentType.includes("text/xml")) {
+      let xmlString = await response.text();
+      console.log("XML: " + xmlString);
+    } 
+
+    // // Get the JSON from the response
+    // let obj = await response.json();
+    // let jsonString = JSON.stringify(obj);
+    // console.log("JSON: " + jsonString);
+
+    // // Get the XML from the response
+    // let xmlString = await response.text();
+    // console.log("XML: " + xmlString);
+
+
     //content.innerHTML += `<p>${jsonString}</p>`;
   };
 
   const sendFetch = async (url) => {
     //Call fetch, wait til we get a response, and then store that response in the variable.
-    let response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      }
-    });
+    const type = document.getElementById('type');
+    let response;
+    if (type.value === "application/json") {
+      response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        }
+      });
+    } 
+    else {
+      response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Accept': 'text/xml',
+        }
+      });
+    }
 
     //Call handleResponse with the response we got back from the server.
     handleResponse(response);
@@ -71,8 +105,8 @@
         e.preventDefault();
         sendFetch(page.value);
         return false;
-      }
-  );
+        
+      });
 
     };
 
